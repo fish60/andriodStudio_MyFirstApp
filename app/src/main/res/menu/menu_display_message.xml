@@ -1,0 +1,28 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.example.chung_che.myfirstapp.DisplayMessageActivity">
+
+    <item android:id="@+id/action_reverse"
+        android:icon="@drawable/ic_action_reverse"
+        android:title="@string/action_reverse"
+        app:showAsAction="ifRoom" />
+
+    <!--
+    android:icon="@drawable/ic_action_clean"
+    app:showAsAction="ifRoom"
+    -->
+    <item android:id="@+id/action_clean"
+        android:icon="@drawable/ic_action_clean"
+        android:title="@string/action_clean"
+        />
+
+    <item android:id="@+id/action_changeActionBar"
+        android:title="@string/action_changeActionBar"
+        />
+
+    <item android:id="@+id/action_settings"
+        android:title="@string/action_settings"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+</menu>
