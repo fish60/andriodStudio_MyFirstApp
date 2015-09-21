@@ -14,4 +14,18 @@
     <string name="action_changeActionBar">next actionbar</string>
 
     <string name="title_activity_display_message">My Message</string>
+
+    <!--
+        for .java using
+            Html.fromHtml(
+                <font color='#ff0000'>  + text + </font>
+            )
+        -->
+    <!--   <font color='#ff0000'>  = " <font color=' " + COLOR_CODE + " '> "   with COLOR_CODE = #RRGGBB -->
+    <string name="font_color_head_01">&lt;font color=\&apos;</string>
+    <string name="font_color_head_02">\&apos;&gt;</string>
+    <!--   </font>    -->
+    <string name="font_color_tail">&lt;/font&gt;</string>
+
+
 </resources>
