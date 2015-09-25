@@ -33,6 +33,7 @@ import android.widget.TextView;
 
 
 public class DisplayMessageActivity extends AppCompatActivity {
+    private final String CURRENT_ACTIONBAR_FLAG = "current_actionBarFlag";
 
     // private
     // textView --> mTextView
@@ -66,6 +67,13 @@ public class DisplayMessageActivity extends AppCompatActivity {
 
         if ( currentActionBar != null ) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            if ( savedInstanceState != null ) {
+                // restore action bar mode
+                mActionbarFlag = savedInstanceState.getInt(CURRENT_ACTIONBAR_FLAG);
+                restoreActionBar();
+            }
+
         }
 
         //getActionBar().setDisplayHomeAsUpEnabled(true);
@@ -105,6 +113,15 @@ public class DisplayMessageActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // save state, ex: action bar mode using flag
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putInt(CURRENT_ACTIONBAR_FLAG, mActionbarFlag);
+
+    }
+
     public void cleanTextView() {
         // empty string now, try to reverse it
         TextView textView = new TextView(this);
@@ -136,6 +153,21 @@ public class DisplayMessageActivity extends AppCompatActivity {
         // this is not the text!!!!!
         //String textViewString2 = textView.toString();
 
+    }
+
+    // restore it for ex: rotating the screen
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        // actionBar is null
+        if ( actionBar == null ) {
+            return ;
+        }
+
+        if ( mActionbarFlag == 0 ) {
+            _changeActionBar(actionBar, R.drawable.gradient_box01, R.color.blue_green);
+        } else {
+            _changeActionBar(actionBar, R.drawable.gradient_box02, R.color.opaque_red);
+        }
     }
 
     public void changeActionBar() {
