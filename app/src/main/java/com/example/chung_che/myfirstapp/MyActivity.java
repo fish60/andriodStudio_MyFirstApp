@@ -87,7 +87,7 @@ public class MyActivity extends AppCompatActivity {
                 // 確認 Toast
                 Toast.makeText(this, getString(R.string.msg_unableToOpenImage), Toast.LENGTH_LONG).show();
 
-                // test for commit
+                // test for commit, again
             }
 
 
