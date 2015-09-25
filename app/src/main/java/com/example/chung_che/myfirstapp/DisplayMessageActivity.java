@@ -1,6 +1,7 @@
 package com.example.chung_che.myfirstapp;
 
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -13,10 +14,34 @@ import android.view.MenuItem;
 import android.view.Window;
 import android.widget.TextView;
 
-public class DisplayMessageActivity extends AppCompatActivity {
+/*
+ * 2015/09/21
+ * call res
+ *     ContextCompat.getColor
+ * add color.xml
+ *     color def
+ * modify strings.xml
+ *     font color def
+ * color for setTitle(Html.fromHtml())
+ *     String.format
+ * add private method _changeActionBar() for reducing duplicate codes
+ *
+ *
+ *
+ * */
 
-    TextView textView;
-    int actionbarFlag = 0;
+
+
+public class DisplayMessageActivity extends AppCompatActivity {
+    private final String CURRENT_ACTIONBAR_FLAG = "current_actionBarFlag";
+
+    // private
+    // textView --> mTextView
+    private TextView mTextView;
+
+    // private
+    // actionbarFlag --> mActionbarFlag
+    private int mActionbarFlag = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,15 +55,27 @@ public class DisplayMessageActivity extends AppCompatActivity {
         String message = intent.getStringExtra(MyActivity.EXTRA_MESSAGE);
 
         //TextView textView = new TextView(this);
-        textView = new TextView(this);
-        textView.setTextSize(40);
-        textView.setText(message);
+        mTextView = new TextView(this);
+        mTextView.setTextSize(40);
+        mTextView.setText(message);
 
-        setContentView(textView);
+       setContentView(mTextView);
 
         // http://stackoverflow.com/questions/32072510/changing-action-bar-colour-programmatically-may-cause-nullpointerexception
         // if use themes with NoActionBar --> will get the NullPointerException
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        ActionBar currentActionBar = getSupportActionBar();
+
+        if ( currentActionBar != null ) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+            if ( savedInstanceState != null ) {
+                // restore action bar mode
+                mActionbarFlag = savedInstanceState.getInt(CURRENT_ACTIONBAR_FLAG);
+                restoreActionBar();
+            }
+
+        }
+
         //getActionBar().setDisplayHomeAsUpEnabled(true);
     }
 
@@ -76,6 +113,15 @@ public class DisplayMessageActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    // save state, ex: action bar mode using flag
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
+        savedInstanceState.putInt(CURRENT_ACTIONBAR_FLAG, mActionbarFlag);
+
+    }
+
     public void cleanTextView() {
         // empty string now, try to reverse it
         TextView textView = new TextView(this);
@@ -88,7 +134,7 @@ public class DisplayMessageActivity extends AppCompatActivity {
     public void reverseTextView() {
         // empty string now, try to reverse it
 
-        CharSequence charSequence = textView.getText();
+        CharSequence charSequence = mTextView.getText();
         int charSequenceLength = charSequence.length();
 
         String textViewString = charSequence.toString();
@@ -102,44 +148,141 @@ public class DisplayMessageActivity extends AppCompatActivity {
             textViewArrayR[charSequenceLength-i-1] = charHead;
         }
         // update it
-        textView.setText(textViewArrayR, 0, charSequenceLength);
+        mTextView.setText(textViewArrayR, 0, charSequenceLength);
 
         // this is not the text!!!!!
         //String textViewString2 = textView.toString();
 
     }
 
+    // restore it for ex: rotating the screen
+    public void restoreActionBar() {
+        ActionBar actionBar = getSupportActionBar();
+        // actionBar is null
+        if ( actionBar == null ) {
+            return ;
+        }
+
+        if ( mActionbarFlag == 0 ) {
+            _changeActionBar(actionBar, R.drawable.gradient_box01, R.color.blue_green);
+        } else {
+            _changeActionBar(actionBar, R.drawable.gradient_box02, R.color.opaque_red);
+        }
+    }
+
     public void changeActionBar() {
         ActionBar actionBar = getSupportActionBar();
+
+        // actionBar is null
+        if ( actionBar == null ) {
+            return ;
+        }
+
+        if ( mActionbarFlag == 0 ) {
+            _changeActionBar(actionBar, R.drawable.gradient_box02, R.color.opaque_red);
+            mActionbarFlag = 1;
+        } else {
+            _changeActionBar(actionBar, R.drawable.gradient_box01, R.color.blue_green);
+            mActionbarFlag = 0;
+        }
+
+        /*
+                 * old version with comments
+
         Resources res = getResources();
 
-        if ( actionbarFlag == 0 ) {
+        if ( mActionbarFlag == 0 ) {
             // require api 21 (but with 8, not ok)
             //Drawable gradientBox = res.getDrawable(R.drawable.gradient_box02, null);
 
             // https://teamtreehouse.com/community/getdrawbleint-is-deprecated
             Drawable gradientBox = ContextCompat.getDrawable(this, R.drawable.gradient_box02);
+
             actionBar.setBackgroundDrawable(gradientBox);
 
             // also change title color
             // in styles <item name="android:textColor">#39fad6</item>
-            getSupportActionBar().setTitle(Html.fromHtml(
-                    "<font color='#ff0000'>I want the same string</font>"
+
+            // use res
+            //getSupportActionBar().setTitle(Html.fromHtml(
+            //    "<font color='#ff0000'>I want the same string</font>"
+            //String command = "<font color='#ff0000'>";
+
+            // get color as int, then remove alpha channel with hex code for Html.fromHtml()
+            int targetColor = ContextCompat.getColor(this, R.color.opaque_red);
+            String targetColorHtml = String.format("#%06X", (0xFFFFFF &
+                    Color.argb(0, Color.red(targetColor), Color.green(targetColor), Color.blue(targetColor))));
+
+            actionBar.setTitle(Html.fromHtml(
+                    res.getString(R.string.font_color_head_01) +
+                            targetColorHtml +
+                            res.getString(R.string.font_color_head_02) +
+                            res.getString(R.string.title_activity_display_message) +
+                            res.getString(R.string.font_color_tail)
             ));
 
-            actionbarFlag = 1;
+            // Integer.toHexString(ContextCompat.getColor(this, R.color.opaque_red))
+
+            //Integer.toHexString(id)
+            // level 23
+            //int color = res.getColor(R.color.opaque_red, null);
+            //Integer.toHexString(color);
+            // --> ContextCompat.getColor(context, R.color.my_color)
+
+            // for debug, show partial info
+            // My Message
+            //actionBar.setTitle(res.getString(R.string.title_activity_display_message));
+            // ffff0000 --> but only need ff0000
+            //actionBar.setTitle(Integer.toHexString(ContextCompat.getColor(this, R.color.opaque_red)));
+            // use ffff0000 --> no change --> alpha not support with font
+            // use 00ff0000 --> ok, but the color is ffff0000 --> WHY????? --> alpha not support with font
+            // use ff0000 --> ok, need use 6 digits only
+            // #%06X --> ex: #FF0000, capital is fine
+            //actionBar.setTitle(targetColorHtml);
+
+
+            mActionbarFlag = 1;
         } else {
             //Drawable gradientBox = res.getDrawable(R.drawable.gradient_box01, null);
             Drawable gradientBox = ContextCompat.getDrawable(this, R.drawable.gradient_box01);
             actionBar.setBackgroundDrawable(gradientBox);
 
             // <string name="title_activity_display_message">My Message</string>
-            getSupportActionBar().setTitle(Html.fromHtml(
+            //getSupportActionBar().setTitle(Html.fromHtml(
+            actionBar.setTitle(Html.fromHtml(
                     "<font color='#39fad6'>My Message</font>"
             ));
 
-            actionbarFlag = 0;
+            mActionbarFlag = 0;
         }
+        */
     }
+
+    // change action bar
+    // input: res drawable for setBackgroundDrawable()
+    // input: res color for setTitle()
+    private void _changeActionBar(ActionBar actionBar, int drawableBackground, int colorTitle) {
+
+        //  action bar background with drawable
+        Drawable gradientBox = ContextCompat.getDrawable(this, drawableBackground);
+        actionBar.setBackgroundDrawable(gradientBox);
+
+        // action bar title with color
+        int targetColor = ContextCompat.getColor(this, colorTitle);
+        String targetColorHtml = String.format("#%06X", (0xFFFFFF &
+                Color.argb(0, Color.red(targetColor), Color.green(targetColor), Color.blue(targetColor))));
+
+        Resources res = getResources();
+
+        actionBar.setTitle(Html.fromHtml(
+                res.getString(R.string.font_color_head_01) +
+                        targetColorHtml +
+                        res.getString(R.string.font_color_head_02) +
+                        res.getString(R.string.title_activity_display_message) +
+                        res.getString(R.string.font_color_tail)
+        ));
+
+    }
+
 
 }

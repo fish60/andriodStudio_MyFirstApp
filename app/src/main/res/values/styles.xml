@@ -64,7 +64,7 @@
 <!-- ActionBar title text -->
     <style name="MyActionBarTitleText"
         parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">
-        <item name="android:textColor">#39fad6</item>
+        <item name="android:textColor">@color/blue_green</item>
         <!-- The textColor property is backward compatible with the Support Library -->
     </style>
 
