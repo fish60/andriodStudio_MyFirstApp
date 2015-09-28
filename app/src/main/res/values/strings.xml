@@ -3,6 +3,8 @@
 
     <string name="edit_message">Enter a message</string>
     <string name="button_send">Send2</string>
+
+    <string name="button_openImage">Open An Image</string>
     
     <string name="hello_world">Hello world!</string>
     <string name="hello_world2">Hello world 2!</string>
@@ -14,4 +16,20 @@
     <string name="action_changeActionBar">next actionbar</string>
 
     <string name="title_activity_display_message">My Message</string>
+
+    <string name="msg_unableToOpenImage">Unable to open image</string>
+
+    <!--
+        for .java using
+            Html.fromHtml(
+                <font color='#ff0000'>  + text + </font>
+            )
+        -->
+    <!--   <font color='#ff0000'>  = " <font color=' " + COLOR_CODE + " '> "   with COLOR_CODE = #RRGGBB -->
+    <string name="font_color_head_01">&lt;font color=\&apos;</string>
+    <string name="font_color_head_02">\&apos;&gt;</string>
+    <!--   </font>    -->
+    <string name="font_color_tail">&lt;/font&gt;</string>
+
+
 </resources>

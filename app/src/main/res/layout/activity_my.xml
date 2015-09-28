@@ -28,12 +28,22 @@
 
 -->
 
-<LinearLayout
+<!--
+android:orientation="horizontal" -> android:orientation="vertical"
+android:layout_width="0dp" 不能用否則看不到
+-->
+
+
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+
+
     android:orientation="horizontal"
+
+
 
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
@@ -43,18 +53,36 @@
 
     <EditText
         android:id="@+id/edit_message"
-        android:layout_weight="1"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:hint="@string/edit_message" />
+        android:hint="@string/edit_message"
+        android:layout_toLeftOf="@+id/button"
+        android:layout_toStartOf="@+id/button"
+        android:layout_alignBottom="@+id/button"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:gravity="start"
+        />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/button_send"
-        android:onClick="sendMessage"/>
+        android:onClick="sendMessage"
+        android:id="@+id/button"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_openImage"
+        android:onClick="openImage"
+        android:id="@+id/buttonOpenImage"
+        android:layout_below="@+id/edit_message"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true" />
 
 
-
-
-</LinearLayout>
+</RelativeLayout>
