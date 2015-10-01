@@ -84,5 +84,39 @@ android:layout_width="0dp" 不能用否則看不到
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_takeScreenShot2"
+        android:onClick="takeScreenShotAndSave"
+        android:id="@+id/buttonScreenShot2"
+        android:layout_below="@+id/buttonOpenImage"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:nestedScrollingEnabled="false" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewScreenshot"
+        android:src="@mipmap/ic_launcher"
+        android:layout_below="@+id/buttonScreenShot2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/att_screenShotView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_takeScreenShot1"
+        android:onClick="takeScreenShotAndSave"
+        android:id="@+id/buttonScreenShot1"
+        android:layout_above="@+id/viewScreenshot"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
 
 </RelativeLayout>
