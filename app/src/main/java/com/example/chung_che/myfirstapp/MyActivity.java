@@ -21,6 +21,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -52,6 +53,7 @@ public class MyActivity extends AppCompatActivity {
 
     // for Bitmap compress, but if use png, ignore this
     private final static int COMPRESS_QUALITY = 100;
+    private final static String SCREENSHOT_DEFAULT_FILE_NAME = "_temp_screenshot_temp_.png";
 
     private Bitmap mSelectedImage = null;
     private ImageView mViewScreenshot = null;
@@ -95,8 +97,12 @@ public class MyActivity extends AppCompatActivity {
             case R.id.action_send:
                 openSend();
                 return true;
-
-
+            case R.id.action_file:
+                callActivityFile();
+                return true;
+            case R.id.action_draw:
+                callActivityDraw();
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
 
@@ -152,6 +158,10 @@ public class MyActivity extends AppCompatActivity {
 
                     // set image to a view
                     mViewScreenshot.setImageBitmap(mSelectedImage);
+
+                    // need catch IOException...
+                    // and this implementation do nothing ?????
+                    //openedStream.close();
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -226,17 +236,27 @@ public class MyActivity extends AppCompatActivity {
     }
 
     // button
-    public void takeScreenShotAndSave(View view) {
+    public void takeScreenshotAndSave(View view) {
         // take screenshot, also save it
+
+        // Only get the button, care view input
+        //Bitmap screenshot = takeScreenshot(view);
+        Bitmap screenshot = null;
 
         int id = view.getId();
 
+
         switch (id) {
-            case R.id.buttonScreenShot1:
-                makeTextAndShow(this, "buttonScreenShot 1", Toast.LENGTH_SHORT);
+            case R.id.buttonScreenshot1:
+                makeTextAndShow(this, "buttonScreenshot 1", Toast.LENGTH_SHORT);
+                // This works, use this (AppCompatActivity is an Activity) --> getWindow() -->
+                screenshot = takeScreenshot(this.getWindow().getDecorView());
+
                 break;
-            case R.id.buttonScreenShot2:
-                makeTextAndShow(this, "buttonScreenShot 2", Toast.LENGTH_SHORT);
+            case R.id.buttonScreenshot2:
+                makeTextAndShow(this, "buttonScreenshot 2", Toast.LENGTH_SHORT);
+                //Bitmap screenshot2 = takeScreenshot2(view);
+                screenshot = takeScreenshot2(this.getWindow().getDecorView());
                 break;
 
 
@@ -245,32 +265,22 @@ public class MyActivity extends AppCompatActivity {
 
         }
 
-
-
-        // Only get the button, bad view input
-        //Bitmap screenShot = takeScreenShot(view);
-
-        // This works, use this (AppCompatActivity is an Activity) --> getWindow() -->
-        Bitmap screenShot = takeScreenShot(this.getWindow().getDecorView());
-
-        //Bitmap screenShot2 = takeScreenShot2(view);
-        Bitmap screenShot2 = takeScreenShot2(this.getWindow().getDecorView());
-
-        // save ?
-        if ( screenShot != null ) {
-            // show it first
-            //mViewScreenshot.setImageBitmap(screenShot);
-
-            mViewScreenshot.setImageBitmap(screenShot2);
-
-            //saveScreenShot(screenShot);
+        if ( screenshot == null ) {
+            makeTextAndShow(this, "No screenshot", Toast.LENGTH_SHORT);
+            return;
         }
 
+        // show it first
+        mViewScreenshot.setImageBitmap(screenshot);
 
+        saveScreenshotInternal(screenshot);
+
+
+        //saveScreenshot(screenshot);
         // show ?
 
     }
-    private Bitmap takeScreenShot2(View view) {
+    private Bitmap takeScreenshot2(View view) {
         view.setDrawingCacheEnabled(true);
         view.buildDrawingCache();
         Bitmap b1 = view.getDrawingCache();
@@ -316,8 +326,8 @@ public class MyActivity extends AppCompatActivity {
         return b;
     }
 
-    private Bitmap takeScreenShot(View view) {
-        Bitmap screenShot = null;
+    private Bitmap takeScreenshot(View view) {
+        Bitmap screenshot = null;
 
 
         try {
@@ -328,33 +338,34 @@ public class MyActivity extends AppCompatActivity {
             // Bitmap.Config.ARGB_8888
             // Bitmap.Config.ARGB_4444
             // Bitmap.Config.RGB_565
-            screenShot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            screenshot = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
-            Canvas canvas = new Canvas(screenShot);
+            Canvas canvas = new Canvas(screenshot);
             view.draw(canvas);
         } catch (Exception e) {
             e.printStackTrace();
             // Bitmap.createBitmap --> out of memory
             // NullPointerException
-            //Toast.makeText(this, "takeScreenShot(): Exception", Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, "takeScreenshot(): Exception", Toast.LENGTH_LONG).show();
 
             // BAD to catch (Exception e), just keep it now
             // bad online example
             // https://www.youtube.com/watch?v=nJ5Wu4XyzbY
 
-            makeTextAndShow(this, "takeScreenShot(): Exception", Toast.LENGTH_LONG);
+            makeTextAndShow(this, "takeScreenshot(): Exception", Toast.LENGTH_LONG);
 
-            return screenShot;
+            return screenshot;
         }
 
         // temp msg
         //Toast.makeText(this, "view.draw(canvas) OK", Toast.LENGTH_LONG).show();
         //makeTextAndShow(this, "view.draw(canvas) OK", Toast.LENGTH_SHORT);
 
-        return screenShot;
+        return screenshot;
     }
 
-    private void saveScreenShot(Bitmap screenShot) {
+    // Environment.getExternalStorageDirectory() --> not internal, is external
+    private void saveScreenshot(Bitmap screenshot) {
         ByteArrayOutputStream byteArrayOutStream = null;
         File file = null;
         String errMsg = "";
@@ -372,7 +383,7 @@ public class MyActivity extends AppCompatActivity {
                          * 0 meaning compress for small size, 100 meaning compress for max quality.
                          * Some formats, like PNG which is lossless, will ignore the quality setting
                          */
-            screenShot.compress(Bitmap.CompressFormat.PNG, COMPRESS_QUALITY, byteArrayOutStream);
+            screenshot.compress(Bitmap.CompressFormat.PNG, COMPRESS_QUALITY, byteArrayOutStream);
 
             // Environment.getExternalStorageDirectory() --> SD card ?
             String fileName = Environment.getExternalStorageDirectory() + File.separator + "player.png";
@@ -406,7 +417,7 @@ public class MyActivity extends AppCompatActivity {
             e.printStackTrace();
             // new FileOutputStream(...);
 
-            makeTextAndShow(this, "saveScreenShot(): FileNotFoundException ", Toast.LENGTH_LONG);
+            makeTextAndShow(this, "saveScreenshot(): FileNotFoundException ", Toast.LENGTH_LONG);
 
         } catch (IOException e) {
             // BAD to catch (Exception e)
@@ -416,8 +427,298 @@ public class MyActivity extends AppCompatActivity {
             // fileOutStream.write(...)
             // fileOutStream.close()
 
-            makeTextAndShow(this, "saveScreenShot(): IOException, " + errMsg, Toast.LENGTH_LONG);
+            makeTextAndShow(this, "saveScreenshot(): IOException, " + errMsg, Toast.LENGTH_LONG);
 
         }
     }
+
+    // do this using a service in the future
+    private void saveScreenshotInternal(Bitmap screenshot) {
+
+        ByteArrayOutputStream byteArrayOutStream = null;
+
+        // if we use openFileOutput(), only need string
+        File file = null;
+
+
+        try {
+
+            byteArrayOutStream = new ByteArrayOutputStream();
+            // Bitmap.CompressFormat.JPEG
+            // Bitmap.CompressFormat.PNG
+            // Bitmap.CompressFormat.WEBP
+
+            /*
+                         * public boolean compress (Bitmap.CompressFormat format, int quality, OutputStream stream)
+                         * quality -->
+                         * Hint to the compressor, 0-100.
+                         * 0 meaning compress for small size, 100 meaning compress for max quality.
+                         * Some formats, like PNG which is lossless, will ignore the quality setting
+                         */
+            screenshot.compress(Bitmap.CompressFormat.PNG, COMPRESS_QUALITY, byteArrayOutStream);
+
+            //file = new File(defaultFileName);
+
+            // throws IOException
+            //if ( file.createNewFile() ) {
+            //    //makeTextAndShow(this, "New file: " + fileName, Toast.LENGTH_SHORT);
+            //} else {
+            //    // The file already exists.
+            //    //makeTextAndShow(this, "File already exists: " + fileName, Toast.LENGTH_SHORT);
+            //} // otherwise, IOException
+
+            // http://developer.android.com/reference/java/io/FileOutputStream.html
+            // no need to createNewFile(), but need new File()
+            //FileOutputStream fileOutStream = new FileOutputStream(file);
+            //fileOutStream.write(byteArrayOutStream.toByteArray());
+            //fileOutStream.close();
+
+            FileOutputStream fos = openFileOutput(SCREENSHOT_DEFAULT_FILE_NAME, Context.MODE_PRIVATE);
+            fos.write(byteArrayOutStream.toByteArray());
+            fos.close();
+
+            // 注意位置, 這樣只有關到部份, 程式碼要重購 ?????
+            // 但其實是空的行動......卻有丟出 IOException 的可能
+            byteArrayOutStream.close();
+
+
+        } catch (FileNotFoundException e) {
+            // never in, if createNewFile() fail, go to IOException
+            // if createNewFile() OK, then file should exist
+
+            // FileOutputStream()
+            // if file cannot be opened for writing
+
+            e.printStackTrace();
+            // new FileOutputStream(...);
+
+
+            makeTextAndShow(this, "saveScreenshotInternal(): FileNotFoundException ", Toast.LENGTH_LONG);
+
+        } catch (IOException e) {
+            // BAD to catch (Exception e)
+            e.printStackTrace();
+
+            // file.createNewFile() --> Permission denied
+            // fileOutStream.write(...)
+            // fileOutStream.close()
+
+            // byteArrayOutStream.close();
+
+            makeTextAndShow(this, "saveScreenshotInternal(): IOException", Toast.LENGTH_LONG);
+
+        }
+
+
+
+
+    }
+
+    // save bitmap to internal storage
+    private void _test_saveScreenshotInternal(Bitmap screenshot) {
+        File fileInternal = getFilesDir();
+        String fileNameDir = fileInternal.getAbsolutePath();
+
+        // ex: /data/data/com.example.chung_che.myfirstapp/files
+        //makeTextAndShow(this, fileInternal.getAbsolutePath(), Toast.LENGTH_LONG);
+
+        // /data/data/com.example.chung_che.myfirstapp/files
+        //makeTextAndShow(this, fileInternal.getPath(), Toast.LENGTH_LONG);
+
+        // files
+        //makeTextAndShow(this, fileInternal.getName(), Toast.LENGTH_LONG);
+
+        String FILENAME = "hello_file";
+        String string = "hello world!";
+        try {
+
+            for (int i=0; i<10; i++) {
+
+                // create dir
+                File subDir = getDir(( (Integer) i ).toString(), MODE_PRIVATE);
+
+                //if ( subDir.mkdir() ) {
+                //if ( subDir.getParentFile().mkdir() ) {
+                //    //
+                //    Toast.makeText(this, "mkdir: " + subDir.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                //} else {
+                //    // ... so we have dir but can not get names
+                //    Toast.makeText(this, "mkdir: " + subDir.getAbsolutePath() + " false", Toast.LENGTH_LONG).show();
+                //}
+
+                // maybe: /data/data/com.example.chung_che.myfirstapp/files/0
+                // --> /data/data/com.example.chung_che.myfirstapp/app_0
+                //makeTextAndShow(this, subDir.getAbsolutePath(), Toast.LENGTH_LONG);
+
+
+                // use new File() to create dir
+                // this is: /data/data/com.example.chung_che.myfirstapp/files/0
+                // File subDir = new File(getFilesDir(), ( (Integer) i ).toString());
+                //File subDir = new File(fileInternal, ( (Integer) i ).toString());
+                //Toast.makeText(this, subDir.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                // use this will cause /data/data/com.example.chung_che.myfirstapp/files/0/hello_file0: open failed: ENOENT (No such file or directory)
+                // in the following code, may need to make dir ??? but the name is not the name
+                //if ( subDir.delete() ) {
+                //    //
+                //    Toast.makeText(this, "Delete: " + subDir.getAbsolutePath(), Toast.LENGTH_LONG).show();
+                //} else {
+                //    // ...
+                //    Toast.makeText(this, "Delete: " + subDir.getAbsolutePath() + " failed", Toast.LENGTH_LONG).show();
+                //}
+
+
+
+                // file name: 0/hello_file, 1/hello_file ...
+                // file name: 0/hello_file0, 1/hello_file1 ...
+                //String fileName = ( (Integer) i ).toString() + File.separator + FILENAME;
+                String fileName = subDir.getAbsolutePath() + File.separator +
+                        FILENAME + ( (Integer) i ).toString();
+
+                File fileInSubDir = new File(fileName);
+
+                // java.lang.IllegalArgumentException: File 0/hello_file contains a path separator
+                //FileOutputStream fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+
+                FileOutputStream fos = new FileOutputStream(fileInSubDir);
+                //fos.write(string.getBytes());
+                fos.close();
+
+            }
+
+            String[] fileNames = fileList();
+            // only 1
+            //makeTextAndShow(this, ((Integer)fileNames.length).toString(), Toast.LENGTH_LONG);
+
+            // hello_file, but this is the old one
+            //makeTextAndShow(this, fileNames[0], Toast.LENGTH_LONG);
+
+            // still 1, still hello_file
+            fileNames = fileInternal.list();
+            makeTextAndShow(this, ((Integer) fileNames.length).toString(), Toast.LENGTH_LONG);
+            //makeTextAndShow(this, fileNames[0], Toast.LENGTH_LONG);
+
+
+            // /data/data/com.example.chung_che.myfirstapp/app_0
+            File _subDir = getDir("0", MODE_PRIVATE);
+            fileNames = _subDir.list();
+
+            // say 0 --> /data/data/com.example.chung_che.myfirstapp/app_0
+            //makeTextAndShow(this, _subDir.getAbsolutePath(), Toast.LENGTH_LONG);
+
+            // 2, we have hello_file and hello_file0, YES
+            // BUT we can not get dir name
+            //makeTextAndShow(this, ((Integer)fileNames.length).toString(), Toast.LENGTH_LONG);
+
+            //makeTextAndShow(this, fileNames[0], Toast.LENGTH_LONG);
+            //makeTextAndShow(this, fileNames[1], Toast.LENGTH_LONG);
+
+
+            // check this one can be delete with true
+            FileOutputStream fos = openFileOutput(FILENAME, Context.MODE_PRIVATE);
+            fos.write(string.getBytes());
+            fos.close();
+
+            File lister = fileInternal.getAbsoluteFile();
+            for ( String list : lister.list() )
+            {
+                //
+                Toast.makeText(this, list, Toast.LENGTH_LONG).show();
+                //File fileToBeDel = new File(list);
+                //boolean delRes = fileToBeDel.delete();
+                boolean delRes = this.deleteFile(list);
+                Toast.makeText(this, "fileInternal -- delRes: " + ((Boolean)delRes).toString() + " for " + list, Toast.LENGTH_LONG).show();
+            }
+
+            // maybe:
+
+            for (int i=0; i<10; i++) {
+                File subDir = getDir(( (Integer) i ).toString(), MODE_PRIVATE);
+                for ( String list : subDir.list() )
+                {
+                    //
+                    Toast.makeText(this, list, Toast.LENGTH_LONG).show();
+                    File fileToBeDel = new File(list);
+                    boolean delRes = fileToBeDel.delete();
+                    Toast.makeText(this, "delRes: " + ((Boolean)delRes).toString() + " for " + list, Toast.LENGTH_LONG).show();
+                }
+                boolean delRes = subDir.delete();
+                Toast.makeText(this, "delRes: " + ((Boolean)delRes).toString() + " for " + subDir.getName(), Toast.LENGTH_LONG).show();
+
+                // false...
+                //boolean delRes = this.deleteFile(subDir.getName());
+                //Toast.makeText(this, "delRes: " + ((Boolean)delRes).toString() + " for " + subDir.getName(), Toast.LENGTH_LONG).show();
+            }
+
+
+        } catch (FileNotFoundException e) {
+            // never in, if createNewFile() fail, go to IOException
+            // if createNewFile() OK, then file should exist
+
+            e.printStackTrace();
+            // new FileOutputStream(...);
+
+            //makeTextAndShow(this, "saveScreenshot(): FileNotFoundException ", Toast.LENGTH_LONG);
+
+        } catch (IOException e) {
+            // BAD to catch (Exception e)
+            e.printStackTrace();
+
+            // file.createNewFile() --> Permission denied
+            // fileOutStream.write(...)
+            // fileOutStream.close()
+
+            makeTextAndShow(this, "saveScreenshot(): IOException", Toast.LENGTH_LONG);
+
+        }
+
+
+    }
+
+    // button, need public
+    public void loadTempScreenshot(View view) {
+        //
+        _loadTempScreenshot();
+    }
+
+    // check if file exist, if yes, load it
+    // file is generated by pressing Screenshot 1 / Screenshot 2
+    // only 1 single file can exist now
+    private void _loadTempScreenshot() {
+        // check if file exist, if yes, load it
+        FileInputStream inputStream = null;
+
+        try {
+
+            inputStream = openFileInput(SCREENSHOT_DEFAULT_FILE_NAME);
+            mSelectedImage = BitmapFactory.decodeStream(inputStream);
+
+            // set image to a view
+            mViewScreenshot.setImageBitmap(mSelectedImage);
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            // file not found, that's ok
+            // just do nothing
+            makeTextAndShow(this, "No temp file now", Toast.LENGTH_LONG);
+        }
+
+
+    }
+
+    private void callActivityFile() {
+        Intent intent = new Intent(this, FileActivity.class);
+        //EditText editText = (EditText) findViewById(R.id.edit_message);
+        //String message = editText.getText().toString();
+        //intent.putExtra(EXTRA_MESSAGE, message);
+        startActivity(intent);
+    }
+
+    private void callActivityDraw() {
+        // TODO
+        // add input image as background
+        Intent intent = new Intent(this, DrawActivity.class);
+        startActivity(intent);
+    }
+
 }

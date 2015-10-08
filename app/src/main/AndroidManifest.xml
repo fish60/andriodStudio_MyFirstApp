@@ -3,25 +3,17 @@
     package="com.example.chung_che.myfirstapp" >
 
     <!-- Overridden by the value in Gradle build script, so just comment ut -->
-    <!--
-    <uses-sdk android:minSdkVersion="11" />
-    -->
-
+    <!-- <uses-sdk android:minSdkVersion="11" /> -->
     <!-- Add  permission to write external storage -->
     <!-- But no need if use internal storage -->
-    <!--
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    -->
-
+    <!-- <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" /> -->
     <!-- Add android:fullBackupContent="true" -->
     <application
         android:allowBackup="true"
+        android:fullBackupContent="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme"
-        android:fullBackupContent="true" >
-
-
+        android:theme="@style/AppTheme" >
         <activity
             android:name=".MyActivity"
             android:label="@string/app_name" >
@@ -32,23 +24,36 @@
             </intent-filter>
         </activity>
 
-
         <!-- can use customized theme for activity only -->
         <activity
             android:name=".DisplayMessageActivity"
             android:label="@string/title_activity_display_message"
+            android:parentActivityName=".MyActivity"
+            android:theme="@style/theme4reverse" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.chung_che.myfirstapp.MyActivity" />
+        </activity>
 
-            android:theme="@style/theme4reverse"
+        <activity
+            android:name=".FileActivity"
+            android:label="@string/title_activity_file"
+            android:parentActivityName=".MyActivity"
+            android:theme="@style/OverlayActionBarTheme" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.chung_che.myfirstapp.MyActivity" />
+        </activity>
 
-            android:parentActivityName=".MyActivity" >
+        <activity
+            android:name=".DrawActivity"
+            android:label="@string/title_activity_draw"
+            android:parentActivityName=".MyActivity"
+            android:theme="@style/OverlayActionBarTheme" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.chung_che.myfirstapp.MyActivity" />
         </activity>
     </application>
 
-</manifest>
-
-<!--
-    <uses-sdk android:minSdkVersion="11" />
--->
+</manifest> <!-- <uses-sdk android:minSdkVersion="11" /> -->
