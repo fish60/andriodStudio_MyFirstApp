@@ -6,9 +6,12 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.PorterDuff;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -96,7 +99,26 @@ public class QuadDrawView extends View implements View.OnTouchListener {
                 invalidate();
                 return true;
             }
+
+            // TODO
+            // re-enable drawing many times
+
+            // once up, show actionbar, end of drawing
+            // thus we could clean old drawing when hiding actionbar
+
+            // use general one
+            //ActionBar actionBar = ((DrawActivity)getContext()).getSupportActionBar();
+            ActionBar actionBar = ((AppCompatActivity)getContext()).getSupportActionBar();
+            if ( actionBar != null ) {
+                actionBar.show();
+            }
+            //paint.setColor(Color.RED);
+            //invalidate();
+            this.setEnabled(false);
         }
+
+
+
         return super.onTouchEvent(event);
     }
 
@@ -112,12 +134,25 @@ public class QuadDrawView extends View implements View.OnTouchListener {
 
     public void clean() {
 
+        // since we hide the actionbar
+        // this would let the onDraw() be called soon
+        // otherwise need ex: one touch event ...
+        // invalidate() will not redraw!
+        // only ensure to call onDraw() LATER
+
+
+        // use general one
+        //ActionBar actionBar = ((DrawActivity)getContext()).getSupportActionBar();
+        ActionBar actionBar = ((AppCompatActivity)getContext()).getSupportActionBar();
+        if ( actionBar != null ) {
+            actionBar.hide();
+        }
+
         clear();
         mPath.reset();
 
         invalidate();
-        //postInvalidate();
-        //setEnabled();draw(new Canvas());
+
 
     }
 

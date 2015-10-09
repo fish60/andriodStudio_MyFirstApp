@@ -78,13 +78,19 @@
     </style>
 
 
+    <!-- parent="@style/Theme.AppCompat.Light.NoActionBar"> -->
     <!-- 沒有 DarkActionBar 則狀態列不會是黑的 -->
     <style name="OverlayActionBarTheme"
         parent="@style/Theme.AppCompat.Light.DarkActionBar">
+
         <!-- 11 but 8 again -->
-        <!-- <item name="android:windowActionBarOverlay">true</item>-->
+        <!-- <item name="android:windowActionBarOverlay">true</item> -->
+        <!-- <item name="android:windowFullscreen">true</item> -->
+
 
         <!-- Support library compatibility -->
+
+
         <item name="windowActionBarOverlay">true</item>
         <item name="actionBarStyle">@style/TransActionBarTheme</item>
     </style>

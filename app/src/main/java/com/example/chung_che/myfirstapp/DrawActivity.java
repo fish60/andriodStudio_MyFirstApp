@@ -1,10 +1,13 @@
 package com.example.chung_che.myfirstapp;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.Window;
 import android.view.WindowManager;
+import android.widget.Toast;
 
 /**
  * drawing, hide status bar
@@ -55,13 +58,16 @@ public class DrawActivity extends AppCompatActivity {
             // clean
             quadDrawView.clean();
 
+            quadDrawView.setEnabled(false);
 
-            //quadDrawView.invalidate();
+
 
 
 
             // enable
             quadDrawView.setEnabled(true);
+
+
 
             return true;
         }
