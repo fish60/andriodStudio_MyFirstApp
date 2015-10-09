@@ -84,5 +84,50 @@ android:layout_width="0dp" 不能用否則看不到
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true" />
 
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_takeScreenshot2"
+        android:onClick="takeScreenshotAndSave"
+        android:id="@+id/buttonScreenshot2"
+        android:layout_below="@+id/buttonOpenImage"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:nestedScrollingEnabled="false" />
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/viewScreenshot"
+        android:src="@mipmap/ic_launcher"
+        android:layout_below="@+id/buttonScreenshot2"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentBottom="true"
+        android:contentDescription="@string/att_screenshotView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_takeScreenshot1"
+        android:onClick="takeScreenshotAndSave"
+        android:id="@+id/buttonScreenshot1"
+        android:layout_above="@+id/viewScreenshot"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/button_loadTempScreenshot"
+        android:onClick="loadTempScreenshot"
+        android:id="@+id/loadTempScreenshot"
+        android:layout_alignTop="@+id/buttonScreenshot2"
+        android:layout_toRightOf="@+id/buttonScreenshot1"
+        android:layout_toLeftOf="@+id/buttonScreenshot2"
+        android:layout_toStartOf="@+id/buttonScreenshot2" />
+
 
 </RelativeLayout>
