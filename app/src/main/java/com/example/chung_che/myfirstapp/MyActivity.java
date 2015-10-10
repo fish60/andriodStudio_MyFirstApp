@@ -15,6 +15,7 @@ import android.util.DisplayMetrics;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -717,6 +718,14 @@ public class MyActivity extends AppCompatActivity {
     private void callActivityDraw() {
         // TODO
         // add input image as background
+
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+        //        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // use full area
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN,
+        //        WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN);
+
         Intent intent = new Intent(this, DrawActivity.class);
         startActivity(intent);
     }

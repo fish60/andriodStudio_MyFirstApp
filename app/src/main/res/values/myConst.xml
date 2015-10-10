@@ -38,4 +38,8 @@ No need to change code! (still use resources -> string)
     <string name="font_color_tail">&lt;/font&gt;</string>
 
 
+    <!-- max input line for edit text -->
+    <integer name="const_max_input_line">3</integer>
+
+
 </resources>
