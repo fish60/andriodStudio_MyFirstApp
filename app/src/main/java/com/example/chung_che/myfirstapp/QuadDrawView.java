@@ -19,6 +19,10 @@ import java.util.List;
 /**
  * Created by JimCC_Yu on 2015/10/8.
  * https://github.com/johncarl81/androiddraw/blob/master/src/main/java/org/example/androiddraw/QuadDrawView.java
+ *
+ * when drawing, hide action bar and other view
+ * other view: edit text
+ *
  */
 public class QuadDrawView extends View implements View.OnTouchListener {
 
@@ -26,6 +30,8 @@ public class QuadDrawView extends View implements View.OnTouchListener {
     // record Path for init an existing draw
 
     //private boolean mEnable = false;
+
+    private View mView = null;
 
     private static final float STROKE_WIDTH = 5f;
 
@@ -112,6 +118,13 @@ public class QuadDrawView extends View implements View.OnTouchListener {
             if ( actionBar != null ) {
                 actionBar.show();
             }
+
+            // show view (edit text)
+            if ( mView != null ) {
+                mView.setVisibility(View.VISIBLE);
+            }
+
+
             //paint.setColor(Color.RED);
             //invalidate();
             this.setEnabled(false);
@@ -148,6 +161,11 @@ public class QuadDrawView extends View implements View.OnTouchListener {
             actionBar.hide();
         }
 
+        // hide view (edit text)
+        if ( mView != null ) {
+            mView.setVisibility(View.INVISIBLE);
+        }
+
         clear();
         mPath.reset();
 
@@ -156,6 +174,9 @@ public class QuadDrawView extends View implements View.OnTouchListener {
 
     }
 
+    public void setView(View view) {
+        mView = view;
+    }
 
     class Point {
         float x, y;
