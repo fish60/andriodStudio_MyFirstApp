@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!--
+2015/10/01
+Create myConst.xml
+
+Move font color constant from strings.xml to here
+
+Since font_color_head_01, font_color_head_02, and font_color_tail
+are constant, they do not need to be translated
+
+No need to change code! (still use resources -> string)
+
+-->
+
+<resources>
+
+    <!--
+        for .java using
+            Html.fromHtml(
+                <font color='#ff0000'>  + text + </font>
+            )
+
+            check code in DisplayMessageActivity.java -> _changeActionBar()
+            actionBar.setTitle(Html.fromHtml(
+                res.getString(R.string.font_color_head_01) +
+                        targetColorHtml +
+                        res.getString(R.string.font_color_head_02) +
+                        res.getString(R.string.title_activity_display_message) +
+                        res.getString(R.string.font_color_tail)
+        ));
+
+        -->
+    <!--   <font color='#ff0000'>  = " <font color=' " + COLOR_CODE + " '> "   with COLOR_CODE = #RRGGBB -->
+    <string name="font_color_head_01">&lt;font color=\&apos;</string>
+    <string name="font_color_head_02">\&apos;&gt;</string>
+    <!--   </font>    -->
+    <string name="font_color_tail">&lt;/font&gt;</string>
+
+
+    <!-- max input line for edit text -->
+    <integer name="const_max_input_line">3</integer>
+
+
+</resources>

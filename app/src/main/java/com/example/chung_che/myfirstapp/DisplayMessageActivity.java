@@ -1,5 +1,6 @@
 package com.example.chung_che.myfirstapp;
 
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -30,10 +31,18 @@ import android.widget.TextView;
  *
  * */
 
-
+/*
+ * 2015/10/01
+ * SharedPreferences
+ * save some preferences (ex: ("actionbarFlag", mActionbarFlag) thus even use Back, we could restore the status of actionbar)
+ * add codes to onCreate() and onStop()
+ *
+ *
+ * */
 
 public class DisplayMessageActivity extends AppCompatActivity {
     private final String CURRENT_ACTIONBAR_FLAG = "current_actionBarFlag";
+    public static final String PREFS_NAME = "MyPrefsFile";
 
     // private
     // textView --> mTextView
@@ -72,6 +81,12 @@ public class DisplayMessageActivity extends AppCompatActivity {
                 // restore action bar mode
                 mActionbarFlag = savedInstanceState.getInt(CURRENT_ACTIONBAR_FLAG);
                 restoreActionBar();
+            } else {
+                // no savedInstanceState
+                // Restore preferences
+                SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+                mActionbarFlag = settings.getInt("actionbarFlag", mActionbarFlag);
+                restoreActionBar();
             }
 
         }
@@ -88,6 +103,19 @@ public class DisplayMessageActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        // We need an Editor object to make preference changes.
+        // All objects are from android.context.Context
+        SharedPreferences settings = getSharedPreferences(PREFS_NAME, 0);
+        SharedPreferences.Editor editor = settings.edit();
+        editor.putInt("actionbarFlag", mActionbarFlag);
+
+        // Commit the edits!
+        editor.commit();
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

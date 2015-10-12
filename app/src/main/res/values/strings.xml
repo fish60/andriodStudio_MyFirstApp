@@ -2,34 +2,55 @@
     <string name="app_name">My First App</string>
 
     <string name="edit_message">Enter a message</string>
-    <string name="button_send">Send2</string>
 
+    <string name="button_send">Send2</string>
     <string name="button_openImage">Open An Image</string>
-    
+
+    <!-- view.draw(canvas) -->
+    <string name="button_takeScreenshot1">Screenshot 1</string>
+
+    <!-- view.getDrawingCache() -->
+    <string name="button_takeScreenshot2">Screenshot 2</string>
+
+    <string name="button_loadTempScreenshot">Load</string>
+
+
     <string name="hello_world">Hello world!</string>
     <string name="hello_world2">Hello world 2!</string>
+
     <string name="action_settings">Settings</string>
 
     <string name="action_send">mySend</string>
+
+    <!-- for FileActivity -->
+    <string name="action_file">file</string>
+    <string name="action_createTestDir">create test dir</string>
+    <string name="action_refreshList">refresh list</string>
+    <!-- for FileActivity -->
+
+    <!-- for draw -->
+    <string name="action_draw">draw</string>
+    <string name="action_drawIt">clean and draw</string>
+    <!-- for draw -->
+
     <string name="action_reverse">reverse</string>
     <string name="action_clean">clean</string>
     <string name="action_changeActionBar">next actionbar</string>
 
     <string name="title_activity_display_message">My Message</string>
+    <string name="title_activity_file">FileActivity</string>
 
+    <string name="msg_selectNothing">Select Nothing</string>
     <string name="msg_unableToOpenImage">Unable to open image</string>
 
-    <!--
-        for .java using
-            Html.fromHtml(
-                <font color='#ff0000'>  + text + </font>
-            )
-        -->
-    <!--   <font color='#ff0000'>  = " <font color=' " + COLOR_CODE + " '> "   with COLOR_CODE = #RRGGBB -->
-    <string name="font_color_head_01">&lt;font color=\&apos;</string>
-    <string name="font_color_head_02">\&apos;&gt;</string>
-    <!--   </font>    -->
-    <string name="font_color_tail">&lt;/font&gt;</string>
+
+
+
+    <string name="att_backgroundImageView">Background image</string>
+    <string name="att_screenshotView">View of the screenshot</string>
+
+    <string name="title_activity_draw">DrawActivity</string>
+
 
 
 </resources>

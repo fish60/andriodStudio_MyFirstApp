@@ -57,9 +57,8 @@
         <item name="android:titleTextStyle">@style/MyActionBarTitleText</item>
         -->
         <item name="titleTextStyle">@style/MyActionBarTitleText</item>
+    </style>
 
-
-</style>
 
 <!-- ActionBar title text -->
     <style name="MyActionBarTitleText"
@@ -76,6 +75,40 @@
         parent="@style/Widget.AppCompat.ActionBar.TabText">
         <!-- useless now -->
         <item name="android:textColor">#fa48c9</item>
+    </style>
+
+
+    <!-- parent="@style/Theme.AppCompat.Light.DarkActionBar"> -->
+    <!-- parent="@style/Theme.AppCompat.Light.NoActionBar"> -->
+    <!-- 沒有 DarkActionBar 則狀態列不會是黑的 -->
+    <style name="OverlayActionBarTheme"
+        parent="@style/Theme.AppCompat.Light">
+
+        <!-- 11 but 8 again -->
+        <!-- <item name="android:windowActionBarOverlay">true</item> -->
+        <!-- <item name="android:windowFullscreen">true</item> -->
+        <item name="android:windowFullscreen">true</item>
+
+
+        <!-- Support library compatibility -->
+        <!-- <item name="windowNoTitle">true</item> -->
+
+
+        <item name="windowActionBarOverlay">true</item>
+        <item name="actionBarStyle">@style/TransActionBarTheme</item>
+    </style>
+
+    <style name="TransActionBarTheme"
+        parent="@style/Theme.AppCompat.Light.DarkActionBar">
+        <!--#b3000000--> <!--@android:drawable/screen_background_dark_transparent-->
+        <!--android: No effect for 8-->
+        <item name="android:background">#33ff39c8</item>
+        <!--Delete android: OK for 8, use drawable only, can not use simple color code -->
+        <item name="background">@android:drawable/screen_background_dark_transparent</item>
+        <!-- for tab bar -->
+        <item name="backgroundStacked">#346c36</item>
+        <!--android:backgroundSplit--> <!--need 14-->
+        <item name="backgroundSplit">@android:drawable/screen_background_dark_transparent</item>
     </style>
 
 </resources>
