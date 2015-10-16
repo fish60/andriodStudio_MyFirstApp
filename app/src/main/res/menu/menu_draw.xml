@@ -4,6 +4,11 @@
     tools:context="com.example.chung_che.myfirstapp.DrawActivity">
 
 
+    <item android:id="@+id/action_moveText"
+        android:icon="@drawable/ic_action_draw"
+        android:title="@string/action_moveText"
+        app:showAsAction="ifRoom" />
+
     <item android:id="@+id/action_drawIt"
         android:icon="@drawable/ic_action_draw"
         android:title="@string/action_drawIt"
