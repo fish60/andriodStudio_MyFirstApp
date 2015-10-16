@@ -31,6 +31,8 @@ public class QuadDrawView extends View implements View.OnTouchListener {
 
     //private boolean mEnable = false;
 
+    // we set view and handle it
+    // not sure if this is fine or not (ex: memory)
     private View mView = null;
 
     private static final float STROKE_WIDTH = 5f;

@@ -30,6 +30,7 @@
 
     <!-- for draw -->
     <string name="action_draw">draw</string>
+    <string name="action_moveText">move note\&apos;s position</string>
     <string name="action_drawIt">clean and draw</string>
     <!-- for draw -->
 
