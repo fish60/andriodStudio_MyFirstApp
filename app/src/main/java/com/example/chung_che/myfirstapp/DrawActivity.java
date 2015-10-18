@@ -2,10 +2,14 @@ package com.example.chung_che.myfirstapp;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
+import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -43,13 +47,23 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     private static int HEIGHT_STATUS_BAR = 0;
 
+    private static int NOTE_TEXT_HEIGHT = 0;
+
+    // should get it using code
+    // edit text height = 7 + lines * 42
+    // 42 should also be a default value
+    private static int SHIFT_BASE = 7;
+
     // TODO
     // maybe use 2 settings for 直橫
     private final String NOTE_POSITION = "notePosition";
 
+    private DrawActivity thisActivity = null;
+
     private RelativeLayout mDrawLayout = null;
     private QuadDrawView mQuadDrawView = null;
     private EditText mNoteText = null;
+
 
     private ImageView mMoveImageView = null;
 
@@ -58,7 +72,6 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
 
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
@@ -77,6 +90,29 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
+
+        setContentView(R.layout.activity_draw);
+
+        // assignment after setContentView()
+        //
+        thisActivity = this;
+
+
+        mDrawLayout = (RelativeLayout) findViewById(R.id.drawLayout);
+        mNoteText = (EditText) findViewById(R.id.noteText);
+        mQuadDrawView = (QuadDrawView) findViewById(R.id.quadDrawView);
+        // image view for testing
+        // move to new position / input using edit text
+        mMoveImageView = (ImageView) findViewById(R.id.testMoveImageView);
+
+
+        // for state transition, check code for detail
+        mDrawLayout.setOnClickListener(this);
+
+        // set view for reappear
+        mQuadDrawView.setView(mNoteText);
+        // touch and move, within a range
+        mMoveImageView.setOnTouchListener(moveListener);
 
 
         // init const here
@@ -110,32 +146,55 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 //HEIGHT_STATUS_BAR = (int) ( res.getDimension(resourceId) ); // float
                 Toast.makeText(this, "HEIGHT_STATUS_BAR: " + ((Integer)HEIGHT_STATUS_BAR).toString(), Toast.LENGTH_LONG).show();
             }
+
+            // 0
+            ActionBar actionBar = this.getSupportActionBar();
+            if ( actionBar != null ) {
+                actionBar.getHeight();
+                Toast.makeText(this,
+                        "actionBar.getHeight(): " + ((Integer)actionBar.getHeight()).toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+            int resourceIdActionBar = res.getIdentifier("action_bar_height", "dimen", "android");
+            if (resourceIdActionBar > 0) {
+                int HEIGHT_ACTION_BAR = res.getDimensionPixelSize(resourceId);
+                Toast.makeText(this,
+                        "actionBar.getHeight(): " + ((Integer)HEIGHT_ACTION_BAR).toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+
+            // 0
+            if ( mNoteText.getLineCount() == 0 ) {
+                NOTE_TEXT_HEIGHT = mNoteText.getHeight();
+            } else {
+                NOTE_TEXT_HEIGHT = mNoteText.getHeight() / mNoteText.getLineCount();
+            }
+            Toast.makeText(this,
+                    "mNoteText.getHeight(): " + ((Integer)NOTE_TEXT_HEIGHT).toString(),
+                    Toast.LENGTH_LONG).show();
+
+
         }
 
 
-        setContentView(R.layout.activity_draw);
-
-        // assignment after setContentView()
-        //
-        mDrawLayout = (RelativeLayout) findViewById(R.id.drawLayout);
-        mNoteText = (EditText) findViewById(R.id.noteText);
-        mQuadDrawView = (QuadDrawView) findViewById(R.id.quadDrawView);
-        // image view for testing
-        // move to new position / input using edit text
-        mMoveImageView = (ImageView) findViewById(R.id.testMoveImageView);
-
-
-        // for state transition, check code for detail
-        mDrawLayout.setOnClickListener(this);
         // set max line (using online code)
         setMaxLineNoteText(mNoteText, MAX_LINE_NOTE_TEXT);
-        // set view for reappear
-        mQuadDrawView.setView(mNoteText);
-        // touch and move, within a range
-        mMoveImageView.setOnTouchListener(moveListener);
+
+
+
 
 
         if ( savedInstanceState != null ) {
+
+            // 0
+            ActionBar actionBar = this.getSupportActionBar();
+            if ( actionBar != null ) {
+                actionBar.getHeight();
+                Toast.makeText(this,
+                        "actionBar.getHeight(): " + ((Integer)actionBar.getHeight()).toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+
             int[] positionArray = savedInstanceState.getIntArray(NOTE_POSITION);
             // 記得可以寫成一行, 前面的會先判斷
             if ( positionArray != null ) {
@@ -144,12 +203,14 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 if ( positionArray.length == 2 ) {
 
                     // (0, 0) ......
+                    /*
                     int[] editTextPosition = {-1, -1};
                     mNoteText.getLocationOnScreen(editTextPosition);
                     Toast.makeText(this, "editTextPosition NOW: ("
                                     + ((Integer)editTextPosition[0]).toString() + ", "
                                     + ((Integer)editTextPosition[1]).toString() + ")",
                             Toast.LENGTH_LONG).show();
+                    */
 
                     // right value
                     Toast.makeText(this, "positionArray: ("
@@ -158,16 +219,20 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                             Toast.LENGTH_LONG).show();
 
                     // useless now
+                    /*
                     mStoredNotePosition = positionArray;
                     mNoteText.layout(positionArray[0],
                             positionArray[1],
                             positionArray[0] + mNoteText.getWidth(),
                             positionArray[1] + mNoteText.getHeight());
+                    */
+                    /*
 
                     Toast.makeText(this, "mStoredNotePosition: ("
                                     + ((Integer)mStoredNotePosition[0]).toString() + ", "
                                     + ((Integer)mStoredNotePosition[1]).toString() + ")",
                             Toast.LENGTH_LONG).show();
+                     */
 
 
                     if ( positionArray[0] != -1 ) {
@@ -175,9 +240,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         RelativeLayout.LayoutParams mNoteTextLayoutParams =
                                 (RelativeLayout.LayoutParams) mNoteText.getLayoutParams();
 
+                        //mNoteTextLayoutParams.setMargins(
+                        //        positionArray[0] - PADDING_HORIZONTAL,
+                        //        positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
+                        //        0, 0);
                         mNoteTextLayoutParams.setMargins(
                                 positionArray[0] - PADDING_HORIZONTAL,
-                                positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
+                                positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
                                 0, 0);
                         mNoteText.setLayoutParams(mNoteTextLayoutParams);
 
@@ -213,10 +282,25 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             // = 20 * 2, 12 + 50
             RelativeLayout.LayoutParams mNoteTextLayoutParams =
                     (RelativeLayout.LayoutParams) mNoteText.getLayoutParams();
+            //mNoteTextLayoutParams.setMargins(200 - PADDING_HORIZONTAL,
+            //        200 - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
+            //        0, 0);
+
+
             mNoteTextLayoutParams.setMargins(200 - PADDING_HORIZONTAL,
-                    200 - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
+                    200 - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
                     0, 0);
+
+            // (0, 0)
+            /*
+            int[] editTextPosition = {-1, -1};
             mNoteText.setLayoutParams(mNoteTextLayoutParams);
+            mNoteText.getLocationOnScreen(editTextPosition);
+            Toast.makeText(this, "onCreate editTextPosition: ("
+                            + ((Integer)editTextPosition[0]).toString() + ", "
+                            + ((Integer)editTextPosition[1]).toString() + ")",
+                    Toast.LENGTH_LONG).show();
+            */
 
         }
 
@@ -373,6 +457,17 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View view) {
 
+        // 112! 出現 12
+        /*
+        ActionBar actionBar = this.getSupportActionBar();
+        if ( actionBar != null ) {
+            actionBar.getHeight();
+            Toast.makeText(this,
+                    "actionBar.getHeight(): " + ((Integer)actionBar.getHeight()).toString(),
+                    Toast.LENGTH_LONG).show();
+        }
+        */
+
         if ( view.getId() == R.id.drawLayout ) {
             hideInput(view);
         }
@@ -382,11 +477,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
         int[] editTextPosition = {-1, -1};
         mNoteText.getLocationOnScreen(editTextPosition);
-        Toast.makeText(this, "editTextPosition: ("
+        Toast.makeText(this, "onClick editTextPosition: ("
                         + ((Integer)editTextPosition[0]).toString() + ", "
                         + ((Integer)editTextPosition[1]).toString() + ")",
                 Toast.LENGTH_LONG).show();
 
+        /*
         if ( mStoredNotePosition[0] != -1 ) {
             mNoteText.layout(mStoredNotePosition[0],
                     mStoredNotePosition[1],
@@ -399,6 +495,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     editTextPosition[0] + mNoteText.getWidth(),
                     editTextPosition[1] + mNoteText.getHeight());
         }
+        */
 
 
         /*
@@ -409,6 +506,18 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         */
 
         if ( editTextPosition[0] != -1 ) {
+
+            /*
+            ActionBar actionBar = this.getSupportActionBar();
+            int actionBarH = 0;
+            if ( actionBar != null ) {
+                actionBarH = actionBar.getHeight();
+                Toast.makeText(this,
+                        "actionBar.getHeight(): " + ((Integer)actionBar.getHeight()).toString(),
+                        Toast.LENGTH_LONG).show();
+            }
+            */
+
             //layoutParams =
             //        //new RelativeLayout.LayoutParams(mNoteText.getWidth(), mNoteText.getHeight());
             //        new RelativeLayout.LayoutParams(mNoteText.getWidth(), mNoteText.getHeight());
@@ -420,10 +529,57 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
             // 16dp, 16dp --> 32 70 = 32, 32 + 38
             // 20dp, 12dp --> 40 62 = 40, 24 + 38
+
+            // HEIGHT_STATUS_BAR = 50
+            // PADDING_VERTICAL_DP = 22 --> need -10
+            // PADDING_VERTICAL_DP = 32 --> need -20
+            // --> + PADDING_VERTICAL_DP - 12
+            //mNoteTextLayoutParams.setMargins(editTextPosition[0] - PADDING_HORIZONTAL,
+            //        editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
+            //        0, 0);
+            //mNoteTextLayoutParams.setMargins(editTextPosition[0] - PADDING_HORIZONTAL,
+            //        editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP - 20,
+            //        0, 0);
+            //mNoteTextLayoutParams.setMargins(editTextPosition[0] - PADDING_HORIZONTAL,
+            //        editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
+            //        0, 0);
+
+            // action bar
+            // 56dp, 112, ok
+            // 66dp, 132, 往下 20
+
+            // 200 - 150 - 38 + 132 --> 144 + 56?
+            // 50, 38, 132
+            // 200 --> 276 = 200 + 76 --> 352 = 276 + 76
+            // 50, 38, 112
+            // 200 --> 276 = 200 + 76 --> 352 = 276 + 76
+            // 50, 38, 152
+            // 200 --> 276 = 200 + 76 --> 352 = 276 + 76
+            // 與 action bar 高度無關
+            /*
+            Toast.makeText(this,
+                    "HEIGHT_STATUS_BAR: " + ((Integer)HEIGHT_STATUS_BAR).toString(),
+                    Toast.LENGTH_LONG).show();
+            Toast.makeText(this,
+                    "PADDING_VERTICAL: " + ((Integer)PADDING_VERTICAL).toString(),
+                    Toast.LENGTH_LONG).show();
+            */
+
+            //mNoteTextLayoutParams.setMargins(editTextPosition[0] - PADDING_HORIZONTAL,
+            //        editTextPosition[1] - HEIGHT_STATUS_BAR * 3 - PADDING_VERTICAL + actionBarH,
+            //        0, 0);
+
+            // 12 應該還是個魔術數字
             mNoteTextLayoutParams.setMargins(editTextPosition[0] - PADDING_HORIZONTAL,
-                    editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
+                    editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
                     0, 0);
             mNoteText.setLayoutParams(mNoteTextLayoutParams);
+
+            mNoteText.getLocationOnScreen(editTextPosition);
+            Toast.makeText(this, "after setLayoutParams editTextPosition: ("
+                            + ((Integer)editTextPosition[0]).toString() + ", "
+                            + ((Integer)editTextPosition[1]).toString() + ")",
+                    Toast.LENGTH_LONG).show();
         }
         //mMoveImageView.requestLayout();
 
@@ -536,9 +692,22 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private View.OnTouchListener moveListener = new View.OnTouchListener() {
         private float x, y;    // 原本圖片存在的X,Y軸位置
         private int mx, my;    // 圖片被拖曳的X ,Y軸距離長度
+        // 49, 91, 133
+        // 7, 42, 42, 42
+        //private int noteTextHeight = 0;
+        private int noteTextHeightMin = 49; // should get it using code
+        //private int noteTextHeightMax = 133;
+        //private int noteTextHeightDelta = 42;
+        private int lineCount = 0;
 
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+
+            //noteTextHeight = mNoteText.getHeight();
+            //Log.d("draw Act", "onTouch " + ((Integer)noteTextHeight).toString());
+
+            lineCount = mNoteText.getLineCount();
+
 
             switch (event.getAction()) {          //判斷觸控的動作
 
@@ -579,24 +748,61 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     */
                     // handling the boundary condition
                     // add more value if needed
-                    if (dx - PADDING_HORIZONTAL < 0) {
-                        dx = PADDING_HORIZONTAL;
+                    if (dx - PADDING_HORIZONTAL - SHIFT_BASE < 0) {
+                        dx = PADDING_HORIZONTAL + SHIFT_BASE;
                         right = dx + v.getWidth();
                     }
-                    if ( right + PADDING_HORIZONTAL > mDrawLayout.getMeasuredWidth() ) {
-                        right = mDrawLayout.getMeasuredWidth() - PADDING_HORIZONTAL;
+                    if ( right + PADDING_HORIZONTAL + SHIFT_BASE > mDrawLayout.getMeasuredWidth() ) {
+                        right = mDrawLayout.getMeasuredWidth() - PADDING_HORIZONTAL - SHIFT_BASE;
                         dx = right - v.getWidth();
                     }
                     // 改成 action bar + shift y
-                    if (dy - 100 - PADDING_VERTICAL_DP < 0) {
-                        dy = 100 + PADDING_VERTICAL_DP;
+                    ActionBar actionBar = thisActivity.getSupportActionBar();
+                    int actionBarH = 0;
+                    if ( actionBar != null ) {
+                        actionBarH = actionBar.getHeight();
+                    }
+
+                    //if (dy - actionBarH - PADDING_VERTICAL_DP < 0) {
+                    //    dy = actionBarH + PADDING_VERTICAL_DP;
+                    //   bottom = dy + v.getHeight();
+                    //}
+                    if (dy - actionBarH - PADDING_VERTICAL - SHIFT_BASE < 0) {
+                        dy = actionBarH + PADDING_VERTICAL + SHIFT_BASE;
                         bottom = dy + v.getHeight();
                     }
+
+
                     // 改成 3 行 (const max line) 總高 + shift y
-                    if ( bottom + 100 + PADDING_VERTICAL_DP > mDrawLayout.getMeasuredHeight() ) {
-                        bottom = mDrawLayout.getMeasuredHeight() - 100 + PADDING_VERTICAL_DP;
+                    //if ( bottom + 100 + PADDING_VERTICAL_DP > mDrawLayout.getMeasuredHeight() ) {
+                    //    bottom = mDrawLayout.getMeasuredHeight() - 100 + PADDING_VERTICAL_DP;
+                    //    dy = bottom - v.getHeight();
+                    //}
+
+                    /*
+                    if ( bottom + noteTextHeightMax - noteTextHeight + PADDING_VERTICAL >
+                            mDrawLayout.getMeasuredHeight() ) {
+                        bottom = mDrawLayout.getMeasuredHeight()
+                                - noteTextHeightMax + noteTextHeight -
+                                PADDING_VERTICAL;
                         dy = bottom - v.getHeight();
                     }
+                    */
+                    int shift = SHIFT_BASE * lineCount;
+
+                    if ( bottom + noteTextHeightMin * (MAX_LINE_NOTE_TEXT-lineCount) + shift + PADDING_VERTICAL >
+                            mDrawLayout.getMeasuredHeight() ) {
+                        bottom = mDrawLayout.getMeasuredHeight()
+                                - noteTextHeightMin * (MAX_LINE_NOTE_TEXT-lineCount)
+                                - shift
+                                - PADDING_VERTICAL;
+                        dy = bottom - v.getHeight();
+                    }
+
+                    //if ( dy + noteTextHeight * 3 + PADDING_VERTICAL_DP > mDrawLayout.getMeasuredHeight() ) {
+                    //    dy = mDrawLayout.getMeasuredHeight() - noteTextHeight * 3 + PADDING_VERTICAL_DP;
+                    //    bottom = dy + v.getHeight();
+                    //}
 
                     // l   Left position, relative to parent
                     // t    Top position, relative to parent

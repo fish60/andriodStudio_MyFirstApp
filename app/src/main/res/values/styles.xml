@@ -105,6 +105,12 @@
         <item name="android:background">#33ff39c8</item>
         <!--Delete android: OK for 8, use drawable only, can not use simple color code -->
         <item name="background">@android:drawable/screen_background_dark_transparent</item>
+
+        <!-- dp -->
+        <item name="height">@dimen/action_bar_height</item>
+
+        <!-- <item name="paddingStart">40dp</item> -->
+
         <!-- for tab bar -->
         <item name="backgroundStacked">#346c36</item>
         <!--android:backgroundSplit--> <!--need 14-->
