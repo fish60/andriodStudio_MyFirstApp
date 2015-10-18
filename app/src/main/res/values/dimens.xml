@@ -3,7 +3,13 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
-    <dimen name="activity_horizontal_margin_full_screen">20dp</dimen>
-    <dimen name="activity_vertical_margin_full_screen">12dp</dimen>
+    <dimen name="activity_horizontal_margin_full_screen">0dp</dimen>
+    <dimen name="activity_vertical_margin_full_screen">0dp</dimen>
+
+    <dimen name="action_bar_height">56dp</dimen>
+
+
+    <!-- <dimen name="abc_action_bar_overflow_padding_start_material">6dp</dimen> -->
+    <!-- <dimen name="abc_action_bar_default_height_material">56dp</dimen> -->
 
 </resources>
