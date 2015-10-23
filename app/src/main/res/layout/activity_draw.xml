@@ -11,9 +11,18 @@
     android:id="@+id/drawLayout"
     tools:context="com.example.chung_che.myfirstapp.DrawActivity">
 
-    <TextView android:text="@string/hello_world" android:layout_width="wrap_content"
+    <!-- TextView -->
+    <EditText
+        android:text="@string/hello_world"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/textView2" />
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/noteTextView"
+        android:layout_marginLeft="50dp"
+        android:enabled="false"
+        android:background="#00ffffff"
+        android:layout_marginTop="60dp" />
 
     <ImageView
         android:layout_width="fill_parent"
@@ -42,6 +51,8 @@
 
     <!-- android:layout_alignParentLeft="true" -->
     <!-- android:layout_alignParentStart="true" -->
+    <!-- android:imeOptions="flag" -->
+    <!-- android:layout_below="@+id/noteTextView" -->
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -52,8 +63,7 @@
         android:maxLines="3"
         android:maxLength="40"
         android:nestedScrollingEnabled="false"
-        android:layout_below="@+id/textView2"
-        android:layout_marginTop="50dp" />
+        android:layout_marginTop="150dp" />
 
     <ImageView
         android:layout_width="wrap_content"

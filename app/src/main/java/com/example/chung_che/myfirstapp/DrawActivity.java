@@ -20,6 +20,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 
@@ -49,6 +50,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     private static int NOTE_TEXT_HEIGHT = 0;
 
+    private int MAGIC_SHIFT = 50;
+
     // should get it using code
     // edit text height = 7 + lines * 42
     // 42 should also be a default value
@@ -63,6 +66,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private RelativeLayout mDrawLayout = null;
     private QuadDrawView mQuadDrawView = null;
     private EditText mNoteText = null;
+    private TextView mNoteTextView = null;
 
 
     private ImageView mMoveImageView = null;
@@ -105,6 +109,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         // move to new position / input using edit text
         mMoveImageView = (ImageView) findViewById(R.id.testMoveImageView);
 
+        mNoteTextView = (TextView) findViewById(R.id.noteTextView);
 
         // for state transition, check code for detail
         mDrawLayout.setOnClickListener(this);
@@ -178,7 +183,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
 
         // set max line (using online code)
-        setMaxLineNoteText(mNoteText, MAX_LINE_NOTE_TEXT);
+        setMaxLineNoteText(mNoteText, MAX_LINE_NOTE_TEXT, mNoteTextView);
 
 
 
@@ -246,7 +251,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         //        0, 0);
                         mNoteTextLayoutParams.setMargins(
                                 positionArray[0] - PADDING_HORIZONTAL,
-                                positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
+                                positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + MAGIC_SHIFT,
                                 0, 0);
                         mNoteText.setLayoutParams(mNoteTextLayoutParams);
 
@@ -288,7 +293,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
 
             mNoteTextLayoutParams.setMargins(200 - PADDING_HORIZONTAL,
-                    200 - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
+                    200 - HEIGHT_STATUS_BAR - PADDING_VERTICAL + MAGIC_SHIFT,
                     0, 0);
 
             // (0, 0)
@@ -454,6 +459,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+
     @Override
     public void onClick(View view) {
 
@@ -471,16 +477,22 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         if ( view.getId() == R.id.drawLayout ) {
             hideInput(view);
         }
-        if ( mIsMovingMode ) {
+        if ( mIsMovingMode) {
             mNoteText.setOnTouchListener(null);
+            // add position
+
+            mNoteText.getLocationOnScreen(mStoredNotePosition);
+            //return;
         }
 
         int[] editTextPosition = {-1, -1};
         mNoteText.getLocationOnScreen(editTextPosition);
+        /*
         Toast.makeText(this, "onClick editTextPosition: ("
                         + ((Integer)editTextPosition[0]).toString() + ", "
                         + ((Integer)editTextPosition[1]).toString() + ")",
                 Toast.LENGTH_LONG).show();
+        */
 
         /*
         if ( mStoredNotePosition[0] != -1 ) {
@@ -506,6 +518,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         */
 
         if ( editTextPosition[0] != -1 ) {
+        //if ( mStoredNotePosition[0] != -1 ) {
 
             /*
             ActionBar actionBar = this.getSupportActionBar();
@@ -569,17 +582,29 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             //        editTextPosition[1] - HEIGHT_STATUS_BAR * 3 - PADDING_VERTICAL + actionBarH,
             //        0, 0);
 
+
+            //mStoredNotePosition
             // 12 應該還是個魔術數字
+            // 跟這個有關...text view 變高時有差
+            // <!-- android:layout_below="@+id/noteTextView" -->
+            // + 12 --> 在 text view 底下 50 的情形下 + 12
+            // + 50 --> 不要設定在 text view 下方, 則使用 margin top? 可能是 HEIGHT_STATUS_BAR?
             mNoteTextLayoutParams.setMargins(editTextPosition[0] - PADDING_HORIZONTAL,
-                    editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
+                    editTextPosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + MAGIC_SHIFT,
                     0, 0);
+            //mNoteTextLayoutParams.setMargins(mStoredNotePosition[0] - PADDING_HORIZONTAL,
+            //        mStoredNotePosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
+            //        0, 0);
             mNoteText.setLayoutParams(mNoteTextLayoutParams);
 
+
+            /*
             mNoteText.getLocationOnScreen(editTextPosition);
             Toast.makeText(this, "after setLayoutParams editTextPosition: ("
                             + ((Integer)editTextPosition[0]).toString() + ", "
                             + ((Integer)editTextPosition[1]).toString() + ")",
                     Toast.LENGTH_LONG).show();
+            */
         }
         //mMoveImageView.requestLayout();
 
@@ -616,7 +641,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     // http://stackoverflow.com/questions/7092961/edittext-maxlines-not-working-user-can-still-input-more-lines-than-set
     // if maxLineNoteText <= 0, can not input any text (will be set "")
-    private void setMaxLineNoteText(final EditText editText, final int maxLineNoteText) {
+    private void setMaxLineNoteText(final EditText editText, final int maxLineNoteText, final TextView mTextView) {
 
         if ( editText == null ) {
             return;
@@ -629,6 +654,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                //Log.d("TextWatcher()", "beforeTextChanged ");
 
                 /*
                 editText.getLocationOnScreen(editTextPosition);
@@ -645,6 +671,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
+                //Log.d("TextWatcher()", "onTextChanged ");
+
 
                 /*
                 editText.getLocationOnScreen(editTextPosition);
@@ -676,8 +704,14 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 if (editText.getLineCount() > maxLineNoteText) {
                     editText.setText(currentText);
                     editText.setSelection(lastCursorPosition);
-                } else
+                } else {
                     currentText = editText.getText().toString();
+                }
+
+                //String textViewString = editText.getText().toString();
+                //char textViewArrayR[] = textViewString.toCharArray();
+                //mTextView.setText(textViewArrayR, 0, textViewString.length());
+                mTextView.setText(currentText);
 
                 editText.addTextChangedListener(this);
             }
