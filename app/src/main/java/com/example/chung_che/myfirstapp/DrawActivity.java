@@ -2,14 +2,12 @@ package com.example.chung_che.myfirstapp;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -35,27 +33,28 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     // to be loaded later from resource
     // we can not use getResources() beforehand
     // in this way, do not use final (need set value later)
-    private static int MAX_LINE_NOTE_TEXT = -1;
+    private int MAX_LINE_NOTE_TEXT = 0;
 
     // TODO
     // get 4 padding value instead of 2
     // if someone uses non-symmetric padding ...
-    private static int PADDING_HORIZONTAL = -1;
-    private static int PADDING_VERTICAL = -1;
+    private int PADDING_HORIZONTAL = 0;
+    private int PADDING_VERTICAL = 0;
 
     // dimens.xml dp, not getDimensionPixelSize()
-    private static int PADDING_VERTICAL_DP = -1;
+    private int PADDING_VERTICAL_DP = 0;
 
-    private static int HEIGHT_STATUS_BAR = 0;
+    private int HEIGHT_STATUS_BAR = 0;
 
-    private static int NOTE_TEXT_HEIGHT = 0;
+    private int NOTE_TEXT_HEIGHT = 0;
 
-    private int MAGIC_SHIFT = 50;
+    private int MAGIC_SHIFT = 75;//50;
 
     // should get it using code
-    // edit text height = 7 + lines * 42
+    // edit text height = 7 + lines * 42 -> not for zx551ml
     // 42 should also be a default value
-    private static int SHIFT_BASE = 7;
+    private int EDIT_TEXT_SHIFT_BASE = 0;
+    private int EDIT_TEXT_HEIGHT_ONE_LINE = 0;
 
     // TODO
     // maybe use 2 settings for 直橫
@@ -67,6 +66,10 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
     private QuadDrawView mQuadDrawView = null;
     private EditText mNoteText = null;
     private TextView mNoteTextView = null;
+
+    // for calculation, disabled edit text -> use TextView should be fine
+    private EditText mEditTextOneLine = null;
+    private EditText mEditTextTwoLines = null;
 
 
     private ImageView mMoveImageView = null;
@@ -111,6 +114,10 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
         mNoteTextView = (TextView) findViewById(R.id.noteTextView);
 
+        // for calculation
+        mEditTextOneLine = (EditText) findViewById(R.id.editTextOneLine);
+        mEditTextTwoLines = (EditText) findViewById(R.id.editTextTwoLines);
+
         // for state transition, check code for detail
         mDrawLayout.setOnClickListener(this);
 
@@ -121,7 +128,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
 
         // init const here
-        if ( MAX_LINE_NOTE_TEXT < 0 ) {
+        if ( MAX_LINE_NOTE_TEXT <= 0 ) {
             Resources res = getResources();
 
             MAX_LINE_NOTE_TEXT = res.getInteger(R.integer.const_max_input_line);
@@ -148,6 +155,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 // 50
                 HEIGHT_STATUS_BAR = res.getDimensionPixelSize(resourceId);
                 // 50
+                // ZX551ML: 75
                 //HEIGHT_STATUS_BAR = (int) ( res.getDimension(resourceId) ); // float
                 Toast.makeText(this, "HEIGHT_STATUS_BAR: " + ((Integer)HEIGHT_STATUS_BAR).toString(), Toast.LENGTH_LONG).show();
             }
@@ -245,14 +253,17 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         RelativeLayout.LayoutParams mNoteTextLayoutParams =
                                 (RelativeLayout.LayoutParams) mNoteText.getLayoutParams();
 
-                        //mNoteTextLayoutParams.setMargins(
-                        //        positionArray[0] - PADDING_HORIZONTAL,
-                        //        positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL_DP,
-                        //        0, 0);
+
                         mNoteTextLayoutParams.setMargins(
                                 positionArray[0] - PADDING_HORIZONTAL,
                                 positionArray[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + MAGIC_SHIFT,
                                 0, 0);
+
+                        mNoteTextLayoutParams.setMargins(
+                                positionArray[0] - PADDING_HORIZONTAL,
+                                positionArray[1] - PADDING_VERTICAL_DP,
+                                0, 0);
+
                         mNoteText.setLayoutParams(mNoteTextLayoutParams);
 
                         //RelativeLayout.LayoutParams layoutParams =
@@ -328,7 +339,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 140 + mNoteText.getHeight());
                 */
 
-
+        if ( mNoteText != null ) {
+            int noteTextHeight = mNoteText.getHeight();
+            Log.d("onCreate", "mNoteText " + ((Integer) noteTextHeight).toString());
+        } else {
+            Log.d("onCreate", "mNoteText: not ready");
+        }
 
 
 
@@ -375,6 +391,20 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                 140 + mNoteText.getWidth(),
                 140 + mNoteText.getHeight());
                 */
+        if ( mNoteText != null ) {
+            int noteTextHeight = mNoteText.getHeight();
+            Log.d("onResume", "mNoteText " + ((Integer) noteTextHeight).toString());
+            mNoteText.measure(0, 0);
+            //mNoteText.setText("");
+            noteTextHeight = mNoteText.getMeasuredHeight();
+            Log.d("onResume", "mNoteText.getMeasuredHeight:  " + ((Integer) noteTextHeight).toString());
+        } else {
+            Log.d("onResume", "mNoteText: not ready");
+        }
+
+        getLineHeightInfo();
+
+
     }
 
     @Override
@@ -462,6 +492,7 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View view) {
+        Log.d("onClick()", "onClick ");
 
         // 112! 出現 12
         /*
@@ -474,9 +505,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         }
         */
 
-        if ( view.getId() == R.id.drawLayout ) {
+        //
+        if ( view.getId() != R.id.noteText ) {
             hideInput(view);
         }
+        //if ( view.getId() == R.id.drawLayout ) {
+        //    hideInput(view);
+        //}
         if ( mIsMovingMode) {
             mNoteText.setOnTouchListener(null);
             // add position
@@ -595,6 +630,10 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             //mNoteTextLayoutParams.setMargins(mStoredNotePosition[0] - PADDING_HORIZONTAL,
             //        mStoredNotePosition[1] - HEIGHT_STATUS_BAR - PADDING_VERTICAL + 12,
             //        0, 0);
+            mNoteTextLayoutParams.setMargins(
+                    editTextPosition[0] - PADDING_HORIZONTAL,
+                    editTextPosition[1] - PADDING_VERTICAL_DP,
+                    0, 0);
             mNoteText.setLayoutParams(mNoteTextLayoutParams);
 
 
@@ -728,7 +767,13 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         private int mx, my;    // 圖片被拖曳的X ,Y軸距離長度
         // 49, 91, 133
         // 7, 42, 42, 42
-        //private int noteTextHeight = 0;
+        // ZX551ML:
+        // 62, 116, 170 => 8 + 54 * N
+        // 73, 136, 199 => 10 + 63 * N
+        // 83, 156, 229 => 10 + 73 * N
+        // 93, 175, 257=> 11 + 82 * N
+
+        private int noteTextHeight = 0;
         private int noteTextHeightMin = 49; // should get it using code
         //private int noteTextHeightMax = 133;
         //private int noteTextHeightDelta = 42;
@@ -737,8 +782,11 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
         @Override
         public boolean onTouch(View v, MotionEvent event) {
 
-            //noteTextHeight = mNoteText.getHeight();
-            //Log.d("draw Act", "onTouch " + ((Integer)noteTextHeight).toString());
+            //EDIT_TEXT_SHIFT_BASE = 82;
+            noteTextHeightMin = 93;
+
+            noteTextHeight = mNoteText.getHeight();
+            Log.d("draw Act", "onTouch " + ((Integer)noteTextHeight).toString());
 
             lineCount = mNoteText.getLineCount();
 
@@ -782,12 +830,12 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     */
                     // handling the boundary condition
                     // add more value if needed
-                    if (dx - PADDING_HORIZONTAL - SHIFT_BASE < 0) {
-                        dx = PADDING_HORIZONTAL + SHIFT_BASE;
+                    if (dx - PADDING_HORIZONTAL - EDIT_TEXT_SHIFT_BASE < 0) {
+                        dx = PADDING_HORIZONTAL + EDIT_TEXT_SHIFT_BASE;
                         right = dx + v.getWidth();
                     }
-                    if ( right + PADDING_HORIZONTAL + SHIFT_BASE > mDrawLayout.getMeasuredWidth() ) {
-                        right = mDrawLayout.getMeasuredWidth() - PADDING_HORIZONTAL - SHIFT_BASE;
+                    if ( right + PADDING_HORIZONTAL + EDIT_TEXT_SHIFT_BASE > mDrawLayout.getMeasuredWidth() ) {
+                        right = mDrawLayout.getMeasuredWidth() - PADDING_HORIZONTAL - EDIT_TEXT_SHIFT_BASE;
                         dx = right - v.getWidth();
                     }
                     // 改成 action bar + shift y
@@ -801,8 +849,8 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                     //    dy = actionBarH + PADDING_VERTICAL_DP;
                     //   bottom = dy + v.getHeight();
                     //}
-                    if (dy - actionBarH - PADDING_VERTICAL - SHIFT_BASE < 0) {
-                        dy = actionBarH + PADDING_VERTICAL + SHIFT_BASE;
+                    if (dy - actionBarH - PADDING_VERTICAL - EDIT_TEXT_SHIFT_BASE < 0) {
+                        dy = actionBarH + PADDING_VERTICAL + EDIT_TEXT_SHIFT_BASE;
                         bottom = dy + v.getHeight();
                     }
 
@@ -822,16 +870,34 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
                         dy = bottom - v.getHeight();
                     }
                     */
-                    int shift = SHIFT_BASE * lineCount;
 
-                    if ( bottom + noteTextHeightMin * (MAX_LINE_NOTE_TEXT-lineCount) + shift + PADDING_VERTICAL >
-                            mDrawLayout.getMeasuredHeight() ) {
-                        bottom = mDrawLayout.getMeasuredHeight()
-                                - noteTextHeightMin * (MAX_LINE_NOTE_TEXT-lineCount)
-                                - shift
-                                - PADDING_VERTICAL;
+                    // TODO: use system value or adjust position when onResume()
+                    int bottomShift = noteTextHeightMin * (MAX_LINE_NOTE_TEXT-lineCount)
+                            + EDIT_TEXT_SHIFT_BASE * lineCount
+                            + PADDING_VERTICAL;
+
+                    //Log.d("draw Act", "MAX_LINE_NOTE_TEXT " + ((Integer)MAX_LINE_NOTE_TEXT).toString());
+                    //Log.d("draw Act", "noteTextHeightMin " + ((Integer)noteTextHeightMin).toString());
+                    //Log.d("draw Act", "EDIT_TEXT_SHIFT_BASE " + ((Integer)EDIT_TEXT_SHIFT_BASE).toString());
+                    //Log.d("draw Act", "bottomShift " + ((Integer)bottomShift).toString());
+
+                    if ( bottom + bottomShift > mDrawLayout.getMeasuredHeight() ) {
+                        bottom = mDrawLayout.getMeasuredHeight() - bottomShift;
                         dy = bottom - v.getHeight();
                     }
+
+                    /*
+                    int shift = EDIT_TEXT_SHIFT_BASE * lineCount;
+                    int bottomIncrease = EDIT_TEXT_HEIGHT_ONE_LINE * (MAX_LINE_NOTE_TEXT-lineCount)
+                            + shift +
+                            PADDING_VERTICAL;
+
+                    if ( bottom + bottomIncrease > mDrawLayout.getMeasuredHeight() ) {
+                        bottom = mDrawLayout.getMeasuredHeight() - bottomIncrease;
+                        dy = bottom - v.getHeight();
+                    }
+                    * */
+
 
                     //if ( dy + noteTextHeight * 3 + PADDING_VERTICAL_DP > mDrawLayout.getMeasuredHeight() ) {
                     //    dy = mDrawLayout.getMeasuredHeight() - noteTextHeight * 3 + PADDING_VERTICAL_DP;
@@ -861,4 +927,29 @@ public class DrawActivity extends AppCompatActivity implements View.OnClickListe
             return true;
         }
     };
+
+    // http://stackoverflow.com/questions/13982014/how-to-know-edittext-height
+    private void getLineHeightInfo() {
+        // EDIT_TEXT_SHIFT_BASE
+        // EDIT_TEXT_HEIGHT_ONE_LINE: height of one line edit text
+        // = EDIT_TEXT_SHIFT_BASE + height increase for each line
+
+        mEditTextOneLine.measure(0, 0);
+        int noteTextHeight = mEditTextOneLine.getMeasuredHeight();
+        Log.d("getLineHeightInfo", "mEditTextOneLine.getMeasuredHeight:  " + ((Integer) noteTextHeight).toString());
+
+        EDIT_TEXT_HEIGHT_ONE_LINE = noteTextHeight;
+
+        mEditTextTwoLines.measure(0, 0);
+        noteTextHeight = mEditTextTwoLines.getMeasuredHeight();
+        Log.d("getLineHeightInfo", "mEditTextTwoLines.getMeasuredHeight:  " + ((Integer) noteTextHeight).toString());
+
+        // two line height - one line height = height increase =>
+        // height increase = noteTextHeight - EDIT_TEXT_HEIGHT_ONE_LINE
+
+        // EDIT_TEXT_SHIFT_BASE = EDIT_TEXT_HEIGHT_ONE_LINE - height increase =>
+        EDIT_TEXT_SHIFT_BASE = EDIT_TEXT_HEIGHT_ONE_LINE * 2 - noteTextHeight;
+
+        Log.d("getLineHeightInfo", "EDIT_TEXT_SHIFT_BASE:  " + ((Integer) EDIT_TEXT_SHIFT_BASE).toString());
+    }
 }

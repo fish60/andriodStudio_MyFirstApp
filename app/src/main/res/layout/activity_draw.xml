@@ -53,6 +53,38 @@
     <!-- android:layout_alignParentStart="true" -->
     <!-- android:imeOptions="flag" -->
     <!-- android:layout_below="@+id/noteTextView" -->
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@mipmap/ic_launcher"
+        android:id="@+id/testMoveImageView"
+        android:contentDescription="@string/att_backgroundImageView" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/editTextOneLine"
+        android:enabled="false"
+        android:background="#00ffffff"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="@string/empty_string" />
+
+    <EditText
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:inputType="textMultiLine"
+        android:ems="10"
+        android:id="@+id/editTextTwoLines"
+        android:enabled="false"
+        android:background="#00ffffff"
+        android:text="@string/empty_two_lines"
+        android:layout_below="@+id/editTextOneLine"
+        android:layout_centerHorizontal="true" />
+
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -64,13 +96,6 @@
         android:maxLength="40"
         android:nestedScrollingEnabled="false"
         android:layout_marginTop="150dp" />
-
-    <ImageView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@mipmap/ic_launcher"
-        android:id="@+id/testMoveImageView"
-        android:contentDescription="@string/att_backgroundImageView" />
 
 
 </RelativeLayout>
